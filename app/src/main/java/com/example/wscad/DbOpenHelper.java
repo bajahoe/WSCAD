@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-//
+
 public class DbOpenHelper {
     private static final String DATABASE_NAME = "status(SQLite).db";
     private static final int DATABASE_VERSION = 1;
