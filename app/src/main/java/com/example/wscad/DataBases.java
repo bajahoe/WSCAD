@@ -1,7 +1,7 @@
 package com.example.wscad;
 
 import android.provider.BaseColumns;
-
+//
 public final class DataBases {
     public static final class CreateDB implements BaseColumns {
         public static final String USERID = "userid";

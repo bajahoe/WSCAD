@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d("showDatabase", "DB Size: " + iCursor.getCount());
         arrayData.clear();
         arrayIndex.clear();
-        while(iCursor.moveToNext()){
+        while(iCursor.moveToNext()){//
             String tempIndex = iCursor.getString(iCursor.getColumnIndex("_id"));
             String tempID = iCursor.getString(iCursor.getColumnIndex("userid"));
             tempID = setTextLength(tempID,10);
