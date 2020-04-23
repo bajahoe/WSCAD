@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         public void handleMessage(Message msg){
             super.handleMessage(msg);
         }
-    };
+    };//
     // 블루투스 끝
     //DB 테스트
     Button btn_Update;
