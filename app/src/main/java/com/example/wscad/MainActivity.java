@@ -1,11 +1,14 @@
 package com.example.wscad;
 
-
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -24,7 +27,32 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private static final String TAG = "Main";
+    // 블루투스 시작
+    // Intent 요청 코드
+    private  static final int REQUEST_CONNECT_DEVICE=1;
+    private  static final int REQUEST_ENABLE_BT=2;
+    // 테스트용 버튼 변수
+    private Button btn_Connect;
+    private Button btn_Send;
 
+    private Thread workerThread = null; // 문자열 수신에 사용되는 쓰레드
+    private byte[] readBuffer; // 수신 된 문자열을 저장하기 위한 버퍼
+    private int readBufferPosition; // 버퍼 내 문자 저장 위치
+
+    private TextView textViewReceive; // 수신 된 데이터를 표시하기 위한 텍스트 뷰
+    private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
+    private Button buttonSend; // 송신하기 위한 버튼
+
+    private BluetoothService btService = null;
+
+    private final Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg){
+            super.handleMessage(msg);
+        }
+    };
+    // 블루투스 끝
+    //DB 테스트
     Button btn_Update;
     Button btn_Insert;
     Button btn_Select;
@@ -47,18 +75,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     long age;
     String gender = "";
     String sort = "userid";
-
+    // DB테스트
     ArrayAdapter<String> arrayAdapter;
 
     static ArrayList<String> arrayIndex =  new ArrayList<String>();
     static ArrayList<String> arrayData = new ArrayList<String>();
     private DbOpenHelper mDbOpenHelper;
-
+    // DB테스트 변수
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        /** Main Layout **/
+        btn_Connect = (Button) findViewById(R.id.btn_connect);
+        textViewReceive = (TextView)findViewById(R.id.textView_receive);
 
+
+        // 블루투스 클래스 생성
+        if(btService == null){
+            btService = new BluetoothService(this, mHandler);
+        }
+
+
+        // DB테스트 버튼
         btn_Insert = (Button) findViewById(R.id.btn_insert);
         btn_Insert.setOnClickListener(this);
         btn_Update = (Button) findViewById(R.id.btn_update);
@@ -98,8 +137,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         btn_Insert.setEnabled(true);
         btn_Update.setEnabled(false);
+        // DB
     }
 
+    //DB
     public void setInsertMode(){
         edit_ID.setText("");
         edit_Name.setText("");
@@ -110,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btn_Update.setEnabled(false);
     }
 
-    //클릭리스너
+    //클릭리스너 in DB
     private AdapterView.OnItemClickListener onClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -135,7 +176,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     };
 
-    //롱클릭 리스터
+    //롱클릭 리스터 in DB
     private AdapterView.OnItemLongClickListener longClickListener = new AdapterView.OnItemLongClickListener() {
         @Override
         public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -194,7 +235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         arrayAdapter.notifyDataSetChanged();
     }
 
-    //텍스트 길이 조정
+    //텍스트 길이 조정 in DB
     public String setTextLength(String text, int length){
         if(text.length()<length){
             int gap = length - text.length();
@@ -207,6 +248,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
+        if(btService.getDeviceState()){
+            // 블루투스 지원 기기
+            btService.enableBluetooth();
+        } else {
+            Toast.makeText(MainActivity.this, "블루투스를 지원하지 않는 기기입니다. 프로그램을 종료합니다.", Toast.LENGTH_SHORT).show();
+            finish();
+        }
+
+        //DB
         switch (v.getId()) {
             case R.id.btn_insert:
                 ID = edit_ID.getText().toString();
@@ -263,6 +313,30 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 check_Name.setChecked(false);
                 sort = "age";
                 break;
+        }
+    }
+    // 블루투스
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d(TAG,"onActivityResult " + resultCode);
+
+        switch (requestCode) {
+
+        case REQUEST_CONNECT_DEVICE:
+            // When DeviceListActivity returns with a device to connect
+            if (resultCode == Activity.RESULT_OK) {
+                btService.getDeviceInfo(data);
+            }
+            break;
+        case REQUEST_ENABLE_BT:
+            // 블루투스 요청이 가능할 때
+            if(resultCode == Activity.RESULT_OK){
+                // Next Step
+                btService.scanDevice();
+            } else {
+                Log.d(TAG,"요청 거부");
+                Toast.makeText(MainActivity.this, "블루투스를 허용해야 정상적으로 기능이 이용 가능합니다!", Toast.LENGTH_SHORT).show();
+            }
+            break;
         }
     }
 }
