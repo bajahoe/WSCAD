@@ -90,7 +90,11 @@ public class DbOpenHelper {
     public void deleteAllColumns() {
         mDB.delete(DataBases.CreateDB._TABLENAME0, null, null);
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
     public boolean deleteColumn(long id){
         return mDB.delete(DataBases.CreateDB._TABLENAME0, "_id="+id, null) > 0;
     }

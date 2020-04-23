@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+<<<<<<< HEAD
 
 import android.os.Handler;
 import android.os.Message;
@@ -68,6 +69,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     CheckBox check_ID;
     CheckBox check_Name;
     CheckBox check_Age;
+=======
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.Toast;
+>>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
 
     long nowIndex;
     String ID;
@@ -86,10 +93,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+<<<<<<< Updated upstream
+=======
+<<<<<<< HEAD
+>>>>>>> Stashed changes
         /** Main Layout **/
         btn_Connect = (Button) findViewById(R.id.btn_connect);
         textViewReceive = (TextView)findViewById(R.id.textView_receive);
 
+<<<<<<< Updated upstream
 
         // 블루투스 클래스 생성
         if(btService == null){
@@ -97,6 +109,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
 
+=======
+
+        // 블루투스 클래스 생성
+        if(btService == null){
+            btService = new BluetoothService(this, mHandler);
+        }
+
+
+>>>>>>> Stashed changes
         // DB테스트 버튼
         btn_Insert = (Button) findViewById(R.id.btn_insert);
         btn_Insert.setOnClickListener(this);
@@ -338,5 +359,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             break;
         }
+<<<<<<< Updated upstream
+=======
+=======
+    }
+    public void onClick(View button){
+        PopupMenu popup=new PopupMenu(this,button);
+        popup.getMenuInflater().inflate(R.menu.menu,popup.getMenu());
+        popup.setOnMenuItemClickListener(
+                new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        Toast.makeText(getApplicationContext(),"클릭된 팝업 메뉴:"+item.getTitle(),Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                });
+        popup.show();
+>>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
+>>>>>>> Stashed changes
     }
 }
