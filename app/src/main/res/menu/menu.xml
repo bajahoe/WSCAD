@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/connblue"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="블루투스 연동"/>
+    <item
+        android:id="@+id/setintensity"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="운동강도 설정"/>
+    <item
+        android:id="@+id/exercisemode"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="운동 모드"/>
+    <item
+        android:id="@+id/normalmode"
+        android:icon="@android:drawable/ic_menu_search"
+        android:title="일반 모드"/>
+
+</menu>
