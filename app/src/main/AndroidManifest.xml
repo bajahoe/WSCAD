@@ -27,10 +27,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!-- 여기서부터 추가 블루투스 디바이스 검색 -->
         <activity android:name=".DeviceListActivity"
-            android:theme="@android:style/Theme.DeviceDefault.Dialog"/>
-        <!-- 여기까지 추가 -->
+            android:label="@string/select_device"
+            android:theme="@android:style/Theme.Dialog"
+            android:configChanges="orientation|keyboardHidden" />
     </application>
 
 </manifest>

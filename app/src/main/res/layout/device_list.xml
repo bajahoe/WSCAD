@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--디바이스 목록-->
 <!-- Copyright (C) 2009 The Android Open Source Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,13 +26,13 @@
         android:background="#666"
         android:textColor="#fff"
         android:paddingLeft="5dp"
-        />
+    />
     <ListView android:id="@+id/paired_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stackFromBottom="true"
         android:layout_weight="1"
-        />
+    />
     <TextView android:id="@+id/title_new_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -42,16 +41,16 @@
         android:background="#666"
         android:textColor="#fff"
         android:paddingLeft="5dp"
-        />
+    />
     <ListView android:id="@+id/new_devices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:stackFromBottom="true"
         android:layout_weight="2"
-        />
+    />
     <Button android:id="@+id/button_scan"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/button_scan"
-        />
+    />
 </LinearLayout>
