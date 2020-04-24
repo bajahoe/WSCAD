@@ -6,7 +6,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
-<<<<<<< HEAD
+
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.PopupMenu;
+import android.widget.Toast;
 
 import android.os.Handler;
 import android.os.Message;
@@ -35,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // 테스트용 버튼 변수
     private Button btn_Connect;
     private Button btn_Send;
+
 
     private Thread workerThread = null; // 문자열 수신에 사용되는 쓰레드
     private byte[] readBuffer; // 수신 된 문자열을 저장하기 위한 버퍼
@@ -70,11 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     CheckBox check_Name;
     CheckBox check_Age;
 =======
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.PopupMenu;
-import android.widget.Toast;
->>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
+
 
     long nowIndex;
     String ID;
@@ -93,31 +94,17 @@ import android.widget.Toast;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
+
         /** Main Layout **/
         btn_Connect = (Button) findViewById(R.id.btn_connect);
         textViewReceive = (TextView)findViewById(R.id.textView_receive);
 
-<<<<<<< Updated upstream
 
         // 블루투스 클래스 생성
         if(btService == null){
             btService = new BluetoothService(this, mHandler);
         }
 
-
-=======
-
-        // 블루투스 클래스 생성
-        if(btService == null){
-            btService = new BluetoothService(this, mHandler);
-        }
-
-
->>>>>>> Stashed changes
         // DB테스트 버튼
         btn_Insert = (Button) findViewById(R.id.btn_insert);
         btn_Insert.setOnClickListener(this);
@@ -359,10 +346,10 @@ import android.widget.Toast;
             }
             break;
         }
-<<<<<<< Updated upstream
-=======
-=======
+
     }
+  
+
     public void onClick(View button){
         PopupMenu popup=new PopupMenu(this,button);
         popup.getMenuInflater().inflate(R.menu.menu,popup.getMenu());
@@ -375,7 +362,6 @@ import android.widget.Toast;
                     }
                 });
         popup.show();
->>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
->>>>>>> Stashed changes
+
     }
 }
