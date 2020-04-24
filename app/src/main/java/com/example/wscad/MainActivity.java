@@ -42,6 +42,12 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+<<<<<<< Updated upstream
+=======
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+>>>>>>> Stashed changes
 /***
  *
  */
@@ -51,8 +57,12 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     private Button mButton_pop;
 
     // test
+<<<<<<< Updated upstream
     byte[] readBuf; // 임시 저장
 
+=======
+    String read_message = "";
+>>>>>>> Stashed changes
     // Debugging
     private static final String TAG = "Main";
 <<<<<<< HEAD
@@ -326,6 +336,10 @@ import android.widget.Toast;
             btn_Update.setEnabled(true);
 >>>>>>> f8c48378687c403c23fea64a612ad0e2c0749b3c
         }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         mButton_pop= (Button)findViewById(R.id.button1);
         mButton_pop.setOnClickListener(new OnClickListener() {
             @Override
@@ -582,13 +596,51 @@ import android.widget.Toast;
                     mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case MESSAGE_READ:
+<<<<<<< Updated upstream
                     readBuf = (byte[]) msg.obj;
                     // construct a string from the valid bytes in the buffer
                     if (true);
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     mConversationArrayAdapter.add(readMessage);
                     //mConversationArrayAdapter.add(mConnectedDeviceName + ":  " + readMessage);
+=======
+                    byte[] readBuf = (byte[])msg.obj;
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    //int index = readMessage.indexOf("x");
+                    /*if(index>-1) {
+                        int length = readMessage.length();
+                        if(index == length) {
+                            read_message += readMessage.substring(0, length - 1);
+                            mConversationArrayAdapter.add(read_message);
+                            read_message = "";
+                            break;
+                        }
+                        else if(index == 0) {
+                            mConversationArrayAdapter.add(read_message);
+                            read_message = "";
+                            if(length>1)
+                                read_message += readMessage.substring(1,length);
+                            break;
+                        }
+                        else {
+                            read_message += readMessage.substring(0,index);
+                            mConversationArrayAdapter.add(read_message);
+                            read_message = readMessage.substring(index+1,length);
+                            break;
+                        }
+                    }
+                    read_message += readMessage;*/
+                    // construct a string from the valid bytes in the buffer
+                    mConversationArrayAdapter.add(readMessage);
+>>>>>>> Stashed changes
                     break;
+
+                    /**
+                     * byte[] readBuf = (byte[])msg.obj;
+                     *                     String readMessage = new String(readBuf, 0, msg.arg1);
+                     *                     // construct a string from the valid bytes in the buffer
+                     *                     mConversationArrayAdapter.add(readMessage); 초기코드
+                     * */
                 case MESSAGE_DEVICE_NAME:
                     // save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);

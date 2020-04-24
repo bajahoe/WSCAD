@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by seo on 2018. 9. 10..
@@ -371,10 +372,15 @@ public class BluetoothService {
             Log.i(TAG, "BEGIN mConnectedThread");
             byte[] buffer = new byte[1024];
             int bytes;
-
+            try {
+                mmInStream.read(buffer);
+            } catch(IOException e) {
+                Log.e(TAG, "Flush error");
+            }
             // Keep listening to the InputStream while connected
             while (true) {
                 try {
+                    Thread.sleep(1000);
                     // Read from the InputStream
                     bytes = mmInStream.read(buffer);
 
@@ -385,6 +391,8 @@ public class BluetoothService {
                     Log.e(TAG, "disconnected", e);
                     connectionLost();
                     break;
+                } catch (InterruptedException e){
+                    Log.e(TAG, "timeout Error", e);
                 }
             }
         }
