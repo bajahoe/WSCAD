@@ -7,9 +7,12 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.text.SimpleDateFormat;
+
 public class DbOpenHelper {
     private static final String DATABASE_NAME = "status(SQLite).db";
     private static final int DATABASE_VERSION = 1;
+    private static final String userid = "Cho_1234";
     public static SQLiteDatabase mDB;
     private DatabaseHelper mDBHelper;
     private Context mCtx;
@@ -56,12 +59,18 @@ public class DbOpenHelper {
     }
 
     //데이터 삽입.
-    public long insertColumn(String userid, String name, long age , String gender){
-        ContentValues values = new ContentValues();
-        values.put(DataBases.CreateDB.USERID, userid);
-        values.put(DataBases.CreateDB.NAME, name);
-        values.put(DataBases.CreateDB.AGE, age);
-        values.put(DataBases.CreateDB.GENDER, gender);
+    public long insertColumn(String bpm, String status){
+        SimpleDateFormat _date = new SimpleDateFormat ( "yyyy-MM-dd");  // 날짜의 형식을 지정
+        SimpleDateFormat _time = new SimpleDateFormat( "HH시mm분ss초");    // 시간의 형식을 지정
+        String format_date = _date.format (System.currentTimeMillis()); // 현재 날짜 반환
+        String format_time = _time.format (System.currentTimeMillis()); // 현재 시간 반환
+
+        ContentValues values = new ContentValues(); // 데이터 틀 생성
+        values.put(DataBases.CreateDB.USERID, userid);  // 사용자 정보
+        values.put(DataBases.CreateDB.DATE, format_date);   // 날짜
+        values.put(DataBases.CreateDB.TIME, format_time);   // 시간
+        values.put(DataBases.CreateDB.BPM, bpm);    // 심박수
+        values.put(DataBases.CreateDB.STATUS, status);  // 심박수에 따른 상태
         return mDB.insert(DataBases.CreateDB._TABLENAME0, null, values);
     }
 
@@ -72,11 +81,11 @@ public class DbOpenHelper {
 
     //데이터 정렬
     public Cursor sortColumn(String sort){
-        Cursor c = mDB.rawQuery( "SELECT * FROM usertable ORDER BY " + sort + ";", null);
+        Cursor c = mDB.rawQuery( "SELECT * FROM userstatus ORDER BY " + sort + ";", null);
         return c;
     }
 
-    //갱신
+    /*//갱신
     public boolean updateColumn(long id, String userid, String name, long age , String gender){
         ContentValues values = new ContentValues();
         values.put(DataBases.CreateDB.USERID, userid);
@@ -84,12 +93,13 @@ public class DbOpenHelper {
         values.put(DataBases.CreateDB.AGE, age);
         values.put(DataBases.CreateDB.GENDER, gender);
         return mDB.update(DataBases.CreateDB._TABLENAME0, values, "_id=" + id, null) > 0;
-    }
+    }*/
 
-    //삭제
+    // 전체 삭제
     public void deleteAllColumns() {
         mDB.delete(DataBases.CreateDB._TABLENAME0, null, null);
     }
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< HEAD
     
@@ -198,8 +208,10 @@ public class DbOpenHelper {
         mDB.delete(DataBases.CreateDB._TABLENAME0, null, null);
     }
 
+=======
+    // 선택 삭제
+>>>>>>> Stashed changes
     public boolean deleteColumn(long id){
         return mDB.delete(DataBases.CreateDB._TABLENAME0, "_id="+id, null) > 0;
     }
 }
-*/
