@@ -9,18 +9,6 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-=======
-
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.PopupMenu;
-import android.widget.Toast;
->>>>>>> Stashed changes
-
->>>>>>> f8c48378687c403c23fea64a612ad0e2c0749b3c
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -65,7 +53,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 >>>>>>> Stashed changes
     // Debugging
     private static final String TAG = "Main";
-<<<<<<< HEAD
     private static final boolean D = true;
     // Message types sent from the BluetoothService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
@@ -135,103 +122,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-=======
-    // 블루투스 시작
-    // Intent 요청 코드
-    private  static final int REQUEST_CONNECT_DEVICE=1;
-    private  static final int REQUEST_ENABLE_BT=2;
-    // 테스트용 버튼 변수
-    private Button btn_Connect;
-    private Button btn_Send;
 
-
-    private Thread workerThread = null; // 문자열 수신에 사용되는 쓰레드
-    private byte[] readBuffer; // 수신 된 문자열을 저장하기 위한 버퍼
-    private int readBufferPosition; // 버퍼 내 문자 저장 위치
-
-    private TextView textViewReceive; // 수신 된 데이터를 표시하기 위한 텍스트 뷰
-    private EditText editTextSend; // 송신 할 데이터를 작성하기 위한 에딧 텍스트
-    private Button buttonSend; // 송신하기 위한 버튼
-
-    private BluetoothService btService = null;
-
-    private final Handler mHandler = new Handler(){
-        @Override
-        public void handleMessage(Message msg){
-            super.handleMessage(msg);
-        }
-    };//
-    // 블루투스 끝
-    //DB 테스트
-    Button btn_Update;
-    Button btn_Insert;
-    Button btn_Select;
-    EditText edit_ID;
-    EditText edit_Name;
-    EditText edit_Age;
-    TextView text_ID;
-    TextView text_Name;
-    TextView text_Age;
-    TextView text_Gender;
-    CheckBox check_Man;
-    CheckBox check_Woman;
-    CheckBox check_ID;
-    CheckBox check_Name;
-    CheckBox check_Age;
-=======
-<<<<<<< Updated upstream
-import android.view.MenuItem;
-import android.view.View;
-import android.widget.PopupMenu;
-import android.widget.Toast;
->>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
-=======
-
->>>>>>> Stashed changes
-
-    long nowIndex;
-    String ID;
-    String name;
-    long age;
-    String gender = "";
-    String sort = "userid";
-    // DB테스트
-    ArrayAdapter<String> arrayAdapter;
-
-    static ArrayList<String> arrayIndex =  new ArrayList<String>();
-    static ArrayList<String> arrayData = new ArrayList<String>();
-    private DbOpenHelper mDbOpenHelper;
-    // DB테스트 변수
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-<<<<<<< HEAD
->>>>>>> Stashed changes
-=======
-
->>>>>>> Stashed changes
-        /** Main Layout **/
-        btn_Connect = (Button) findViewById(R.id.btn_connect);
-        textViewReceive = (TextView)findViewById(R.id.textView_receive);
->>>>>>> f8c48378687c403c23fea64a612ad0e2c0749b3c
-
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-
-        // 블루투스 클래스 생성
-        if(btService == null){
-            btService = new BluetoothService(this, mHandler);
-        }
-
-
-=======
-=======
         if (D) Log.e(TAG, "+++ ON CREATE +++");
->>>>>>> Stashed changes
 
         // Set up the window layout
         final Window window = getWindow();
@@ -240,101 +132,16 @@ import android.widget.Toast;
             useTitleFeature = window
                     .requestFeature(Window.FEATURE_CUSTOM_TITLE);
         }
-<<<<<<< Updated upstream
-
-
->>>>>>> Stashed changes
-=======
         setContentView(R.layout.activity_main); // 중복이니 코드수정
         if (useTitleFeature) {
             window.setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
                     R.layout.custom_title);
             // Set up the custom title
 
-<<<<<<< HEAD
             mTitle = (TextView) findViewById(R.id.title_left_text);
             mTitle.setText(R.string.app_name);
             mTitle = (TextView) findViewById(R.id.title_right_text);
 
-=======
->>>>>>> Stashed changes
-        // DB테스트 버튼
-        btn_Insert = (Button) findViewById(R.id.btn_insert);
-        btn_Insert.setOnClickListener(this);
-        btn_Update = (Button) findViewById(R.id.btn_update);
-        btn_Update.setOnClickListener(this);
-        btn_Select = (Button) findViewById(R.id.btn_select);
-        btn_Select.setOnClickListener(this);
-        edit_ID = (EditText) findViewById(R.id.edit_id);
-        edit_Name = (EditText) findViewById(R.id.edit_name);
-        edit_Age = (EditText) findViewById(R.id.edit_age);
-        text_ID = (TextView) findViewById(R.id.text_id);
-        text_Name = (TextView) findViewById(R.id.text_name);
-        text_Age = (TextView) findViewById(R.id.text_age);
-        text_Gender= (TextView) findViewById(R.id.text_gender);
-        check_Man = (CheckBox) findViewById(R.id.check_man);
-        check_Man.setOnClickListener(this);
-        check_Woman = (CheckBox) findViewById(R.id.check_woman);
-        check_Woman.setOnClickListener(this);
-        check_ID = (CheckBox) findViewById(R.id.check_userid);
-        check_ID.setOnClickListener(this);
-        check_Name = (CheckBox) findViewById(R.id.check_name);
-        check_Name.setOnClickListener(this);
-        check_Age = (CheckBox) findViewById(R.id.check_age);
-        check_Age.setOnClickListener(this);
-
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        ListView listView = (ListView) findViewById(R.id.db_list_view);
-        listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(onClickListener);
-        listView.setOnItemLongClickListener(longClickListener);
-
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-
-        check_ID.setChecked(true);
-        showDatabase(sort);
-
-        btn_Insert.setEnabled(true);
-        btn_Update.setEnabled(false);
-        // DB
-    }
-
-    //DB
-    public void setInsertMode(){
-        edit_ID.setText("");
-        edit_Name.setText("");
-        edit_Age.setText("");
-        check_Man.setChecked(false);
-        check_Woman.setChecked(false);
-        btn_Insert.setEnabled(true);
-        btn_Update.setEnabled(false);
-    }
-
-    //클릭리스너 in DB
-    private AdapterView.OnItemClickListener onClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Log.e("On Click", "position = " + position);
-            nowIndex = Long.parseLong(arrayIndex.get(position));
-            Log.e("On Click", "nowIndex = " + nowIndex);
-            Log.e("On Click", "Data: " + arrayData.get(position));
-            String[] tempData = arrayData.get(position).split("\\s+");
-            Log.e("On Click", "Split Result = " + tempData);
-            edit_ID.setText(tempData[0].trim());
-            edit_Name.setText(tempData[1].trim());
-            edit_Age.setText(tempData[2].trim());
-            if(tempData[3].trim().equals("Man")){
-                check_Man.setChecked(true);
-                gender = "Man";
-            }else{
-                check_Woman.setChecked(true);
-                gender = "Woman";
-            }
-            btn_Insert.setEnabled(false);
-            btn_Update.setEnabled(true);
->>>>>>> f8c48378687c403c23fea64a612ad0e2c0749b3c
         }
 <<<<<<< Updated upstream
 =======
@@ -706,38 +513,7 @@ import android.widget.Toast;
                 ensureDiscoverable();   // 300초간 검색 허용
                 return true;
         }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-=======
-=======
-    }
-=======
-<<<<<<< HEAD
         return false;
-=======
-
-    }
-  
-
->>>>>>> Stashed changes
-    public void onClick(View button){
-        PopupMenu popup=new PopupMenu(this,button);
-        popup.getMenuInflater().inflate(R.menu.menu,popup.getMenu());
-        popup.setOnMenuItemClickListener(
-                new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        Toast.makeText(getApplicationContext(),"클릭된 팝업 메뉴:"+item.getTitle(),Toast.LENGTH_SHORT).show();
-                        return true;
-                    }
-                });
-        popup.show();
-<<<<<<< Updated upstream
->>>>>>> ff40487c20db7ebe170804e33a2a811eaf8d7d87
->>>>>>> Stashed changes
-=======
-
->>>>>>> f8c48378687c403c23fea64a612ad0e2c0749b3c
     }
 
     /**
@@ -774,7 +550,6 @@ import android.widget.Toast;
     }
     btn_Insert.setEnabled(false);
     btn_Update.setEnabled(true);
->>>>>>> Stashed changes
     }
     };
 
