@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
             // Set up the custom title
 
             mTitle = (TextView) findViewById(R.id.title_left_text);
-            mTitle.setText(R.string.app_name);
+         //   mTitle.setText(R.string.app_name);//!@#$
             mTitle = (TextView) findViewById(R.id.title_right_text);
 
         }
@@ -197,19 +197,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
         mConversationView.setAdapter(mConversationArrayAdapter);
 
         // Initialize the compose field with a listener for the return key
-        mOutEditText = (EditText) findViewById(R.id.edit_text_out);
-        mOutEditText.setOnEditorActionListener(mWriteListener);
 
         // Initialize the send button with a listener that for click events
-        mSendButton = (Button) findViewById(R.id.button_send);
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Send a message using content of the edit text widget
-                TextView view = (TextView) findViewById(R.id.edit_text_out);
-                String message = view.getText().toString();
-                sendMessage(message);
-            }
-        });
 
         // Initialize the BluetoothService to perform bluetooth connections
         mChatService = new BluetoothService(this, mHandler);
@@ -273,18 +262,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     }
 
     // The action listener for the EditText widget, to listen for the return key
-    private TextView.OnEditorActionListener mWriteListener =
-            new TextView.OnEditorActionListener() {
-                public boolean onEditorAction(TextView view, int actionId, KeyEvent event) {
-                    // If the action is a key-up event on the return key, send the message
-                    if (actionId == EditorInfo.IME_NULL && event.getAction() == KeyEvent.ACTION_UP) {
-                        String message = view.getText().toString();
-                        sendMessage(message);
-                    }
-                    if (D) Log.i(TAG, "END onEditorAction");
-                    return true;
-                }
-            };
 
     // The Handler that gets information back from the BluetoothService
     private final Handler mHandler = new Handler() {
