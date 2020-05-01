@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     private ListView mConversationView;
     private EditText mOutEditText;
     private Button mSendButton;
+    private TextView heartbit;
 
     // Name of the connected device
     private String mConnectedDeviceName = null;
@@ -80,7 +81,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         if (D) Log.e(TAG, "+++ ON CREATE +++");
 
         // Set up the window layout
@@ -122,10 +122,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                                 Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);   // 기기 연결 요청
                                 return true;
-                            case R.id.discoverable: // 검색 허용
-                                // Ensure this device is discoverable by others
-                                ensureDiscoverable();   // 300초간 검색 허용
-                                return true;
                         }
                         return false;
                     }
@@ -153,6 +149,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
             finish();
             return;
         }
+
+        heartbit=(TextView) findViewById(R.id.textView2);
     }
 
     @Override
@@ -193,8 +191,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
         // Initialize the array adapter for the conversation thread
         mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
-        mConversationView = (ListView) findViewById(R.id.in);
-        mConversationView.setAdapter(mConversationArrayAdapter);
+     //   mConversationView = (ListView) findViewById(R.id.in);
+     //   mConversationView.setAdapter(mConversationArrayAdapter);
 
         // Initialize the compose field with a listener for the return key
 
@@ -319,7 +317,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     }
                     read_message += readMessage;*/
                     // construct a string from the valid bytes in the buffer
-                    mConversationArrayAdapter.add(readMessage);
+                  //  mConversationArrayAdapter.add(readMessage);
+                    heartbit.setText(readMessage);
                     break;
 
                     /**
@@ -418,10 +417,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 // Launch the DeviceListActivity to see devices and do scan
                 Intent serverIntent = new Intent(this, DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);   // 기기 연결 요청
-                return true;
-            case R.id.discoverable: // 검색 허용
-                // Ensure this device is discoverable by others
-                ensureDiscoverable();   // 300초간 검색 허용
                 return true;
         }
         return false;

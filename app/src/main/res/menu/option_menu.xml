@@ -4,7 +4,10 @@
     <item android:id="@+id/scan"
           android:icon="@android:drawable/ic_menu_search"
           android:title="@string/connect" />
-    <item android:id="@+id/discoverable"
-          android:icon="@android:drawable/ic_menu_mylocation"
-          android:title="@string/discoverable" />
+    <item android:id="@+id/connDB"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:title="진단하기" />
+    <item android:id="@+id/exercisemode"
+        android:icon="@android:drawable/ic_menu_mylocation"
+        android:title="운동모드" />
 </menu>
