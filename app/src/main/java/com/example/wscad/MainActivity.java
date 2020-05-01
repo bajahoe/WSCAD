@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.provider.ContactsContract;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -78,6 +79,19 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     // Member object for the chat services
     private BluetoothService mChatService = null;
 
+    // DB 변수 및 테스트를 위한 디폴트값
+    long nowIndex;
+    int bpm;
+    String status = "위험";
+    String sort = "userid";
+    // DB테스트
+
+    ArrayAdapter<String> arrayAdapter;
+
+    static ArrayList<String> arrayIndex =  new ArrayList<String>();
+    static ArrayList<String> arrayData = new ArrayList<String>();
+    private DbOpenHelper mDbOpenHelper;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,12 +111,12 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
             // Set up the custom title
 
             mTitle = (TextView) findViewById(R.id.title_left_text);
-         //   mTitle.setText(R.string.app_name);//!@#$
+            //   mTitle.setText(R.string.app_name);//!@#$
             mTitle = (TextView) findViewById(R.id.title_right_text);
 
         }
 
-        mButton_pop= (Button)findViewById(R.id.button1);
+        mButton_pop = (Button) findViewById(R.id.button1);
         mButton_pop.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,6 +136,12 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                                 Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);
                                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);   // 기기 연결 요청
                                 return true;
+
+                            case R.id.diagnose:
+                                Intent intent = new Intent(MainActivity.this, DBActivity.class);
+                                startActivity(intent);
+                                return true;
+
                         }
                         return false;
                     }
@@ -130,16 +150,16 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
             }
         });
         /**requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_main);
-        this.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
+         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+         WindowManager.LayoutParams.FLAG_FULLSCREEN);
+         setContentView(R.layout.activity_main);
+         this.getWindow().setFeatureInt(Window.FEATURE_CUSTOM_TITLE, R.layout.custom_title);
 
-        // Set up the custom title
-        mTitle = (TextView) findViewById(R.id.title_left_text);
-        mTitle.setText(R.string.app_name);
-        mTitle = (TextView) findViewById(R.id.title_right_text);
-*/
+         // Set up the custom title
+         mTitle = (TextView) findViewById(R.id.title_left_text);
+         mTitle.setText(R.string.app_name);
+         mTitle = (TextView) findViewById(R.id.title_right_text);
+         */
         // Get local Bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -149,8 +169,15 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
             finish();
             return;
         }
+        mDbOpenHelper = new DbOpenHelper(this);
+        mDbOpenHelper.open();
+        mDbOpenHelper.create();
 
-        heartbit=(TextView) findViewById(R.id.textView2);
+        mDbOpenHelper.close();
+
+
+        heartbit = (TextView) findViewById(R.id.textView2);
+
     }
 
     @Override
@@ -191,8 +218,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
         // Initialize the array adapter for the conversation thread
         mConversationArrayAdapter = new ArrayAdapter<String>(this, R.layout.message);
-     //   mConversationView = (ListView) findViewById(R.id.in);
-     //   mConversationView.setAdapter(mConversationArrayAdapter);
+        //   mConversationView = (ListView) findViewById(R.id.in);
+        //   mConversationView.setAdapter(mConversationArrayAdapter);
 
         // Initialize the compose field with a listener for the return key
 
@@ -290,43 +317,22 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     mConversationArrayAdapter.add("Me:  " + writeMessage);
                     break;
                 case MESSAGE_READ:
-                    byte[] readBuf = (byte[])msg.obj;
+                    byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    //int index = readMessage.indexOf("x");
-                    /*if(index>-1) {
-                        int length = readMessage.length();
-                        if(index == length) {
-                            read_message += readMessage.substring(0, length - 1);
-                            mConversationArrayAdapter.add(read_message);
-                            read_message = "";
-                            break;
-                        }
-                        else if(index == 0) {
-                            mConversationArrayAdapter.add(read_message);
-                            read_message = "";
-                            if(length>1)
-                                read_message += readMessage.substring(1,length);
-                            break;
-                        }
-                        else {
-                            read_message += readMessage.substring(0,index);
-                            mConversationArrayAdapter.add(read_message);
-                            read_message = readMessage.substring(index+1,length);
-                            break;
-                        }
-                    }
-                    read_message += readMessage;*/
-                    // construct a string from the valid bytes in the buffer
-                  //  mConversationArrayAdapter.add(readMessage);
                     heartbit.setText(readMessage);
+                    bpm=Integer.parseInt(readMessage);
+                    status = check_Status(bpm);
+                    mDbOpenHelper.open();
+                    mDbOpenHelper.insertColumn(Integer.toString(bpm), status);
+                    mDbOpenHelper.close();
                     break;
 
-                    /**
-                     * byte[] readBuf = (byte[])msg.obj;
-                     *                     String readMessage = new String(readBuf, 0, msg.arg1);
-                     *                     // construct a string from the valid bytes in the buffer
-                     *                     mConversationArrayAdapter.add(readMessage); 초기코드
-                     * */
+                /**
+                 * byte[] readBuf = (byte[])msg.obj;
+                 *                     String readMessage = new String(readBuf, 0, msg.arg1);
+                 *                     // construct a string from the valid bytes in the buffer
+                 *                     mConversationArrayAdapter.add(readMessage); 초기코드
+                 * */
                 case MESSAGE_DEVICE_NAME:
                     // save the connected device's name
                     mConnectedDeviceName = msg.getData().getString(DEVICE_NAME);
@@ -343,16 +349,16 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
     // 상태 체크 함수. BPM 에 따라 결과 반환
     private String check_Status(int BPM) {
-        String status="";
-        if(BPM <= 5){
+        String status = "";
+        if (BPM <= 5) {
             status = "응급";
             Intent intent = new Intent(this, GPSActivity.class);
             startActivityForResult(intent, RESULT_GPS_REQUEST); // go to onActivityResult => RESULT_GPS_REQUEST
-        } else if(BPM < 60) {   // 서맥 관측
+        } else if (BPM < 60) {   // 서맥 관측
             status = "주의";
-        } else if (BPM <=100) {
+        } else if (BPM <= 100) {
             status = "정상";
-        } else if (BPM>100) {   // 빈맥 관측
+        } else if (BPM > 100) {   // 빈맥 관측
             status = "주의";
         }
         return status;
@@ -418,480 +424,12 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 Intent serverIntent = new Intent(this, DeviceListActivity.class);
                 startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);   // 기기 연결 요청
                 return true;
+
+            case R.id.diagnose:
+                Intent intent = new Intent(MainActivity.this, DBActivity.class);
+                startActivity(intent);
+                return true;
         }
         return false;
     }
-
-    /**
-     //DB
-     public void setInsertMode(){
-     edit_ID.setText("");
-     edit_Name.setText("");
-     edit_Age.setText("");
-     check_Man.setChecked(false);
-     check_Woman.setChecked(false);
-     btn_Insert.setEnabled(true);
-     btn_Update.setEnabled(false);
-     }
-
-     //클릭리스너 in DB
-     private AdapterView.OnItemClickListener onClickListener = new AdapterView.OnItemClickListener() {
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-    Log.e("On Click", "position = " + position);
-    nowIndex = Long.parseLong(arrayIndex.get(position));
-    Log.e("On Click", "nowIndex = " + nowIndex);
-    Log.e("On Click", "Data: " + arrayData.get(position));
-    String[] tempData = arrayData.get(position).split("\\s+");
-    Log.e("On Click", "Split Result = " + tempData);
-    edit_ID.setText(tempData[0].trim());
-    edit_Name.setText(tempData[1].trim());
-    edit_Age.setText(tempData[2].trim());
-    if(tempData[3].trim().equals("Man")){
-    check_Man.setChecked(true);
-    gender = "Man";
-    }else{
-    check_Woman.setChecked(true);
-    gender = "Woman";
-    }
-    btn_Insert.setEnabled(false);
-    btn_Update.setEnabled(true);
-    }
-    };
-
-     //롱클릭 리스터 in DB
-     private AdapterView.OnItemLongClickListener longClickListener = new AdapterView.OnItemLongClickListener() {
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-    Log.d("Long Click", "position = " + position);
-    nowIndex = Long.parseLong(arrayIndex.get(position));
-    String[] nowData = arrayData.get(position).split("\\s+");
-    String viewData = nowData[0] + ", " + nowData[1] + ", " + nowData[2] + ", " + nowData[3];
-    AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-    dialog.setTitle("데이터 삭제")
-    .setMessage("해당 데이터를 삭제 하시겠습니까?" + "\n" + viewData)
-    .setPositiveButton("네", new DialogInterface.OnClickListener() {
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-    Toast.makeText(MainActivity.this, "데이터를 삭제했습니다.", Toast.LENGTH_SHORT).show();
-    mDbOpenHelper.deleteColumn(nowIndex);
-    showDatabase(sort);
-    setInsertMode();
-    }
-    })
-    .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-    @Override
-    public void onClick(DialogInterface dialog, int which) {
-    Toast.makeText(MainActivity.this, "삭제를 취소했습니다.", Toast.LENGTH_SHORT).show();
-    setInsertMode();
-    }
-    })
-    .create()
-    .show();
-    return false;
-    }
-    };
-
-     //데이터 베이스 출력 함수
-     public void showDatabase(String sort){
-     Cursor iCursor = mDbOpenHelper.sortColumn(sort);
-     Log.d("showDatabase", "DB Size: " + iCursor.getCount());
-     arrayData.clear();
-     arrayIndex.clear();
-     while(iCursor.moveToNext()){
-     String tempIndex = iCursor.getString(iCursor.getColumnIndex("_id"));
-     String tempID = iCursor.getString(iCursor.getColumnIndex("userid"));
-     tempID = setTextLength(tempID,10);
-     String tempName = iCursor.getString(iCursor.getColumnIndex("name"));
-     tempName = setTextLength(tempName,10);
-     String tempAge = iCursor.getString(iCursor.getColumnIndex("age"));
-     tempAge = setTextLength(tempAge,10);
-     String tempGender = iCursor.getString(iCursor.getColumnIndex("gender"));
-     tempGender = setTextLength(tempGender,10);
-
-     String Result = tempID + tempName + tempAge + tempGender;
-     arrayData.add(Result);
-     arrayIndex.add(tempIndex);
-     }
-     arrayAdapter.clear();
-     arrayAdapter.addAll(arrayData);
-     arrayAdapter.notifyDataSetChanged();
-     }
-
-     //텍스트 길이 조정 in DB
-     public String setTextLength(String text, int length){
-     if(text.length()<length){
-     int gap = length - text.length();
-     for (int i=0; i<gap; i++){
-     text = text + " ";
-     }
-     }
-     return text;
-     }
-     */
-    /**
-     @Override
-     public void onClick(View v) {
-     if(btService.getDeviceState()){
-     // 블루투스 지원 기기
-     btService.enableBluetooth();
-     } else {
-     Toast.makeText(MainActivity.this, "블루투스를 지원하지 않는 기기입니다. 프로그램을 종료합니다.", Toast.LENGTH_SHORT).show();
-     finish();
-     }
-
-     //DB
-     switch (v.getId()) {
-     case R.id.btn_insert:
-     ID = edit_ID.getText().toString();
-     name = edit_Name.getText().toString();
-     age = Long.parseLong(edit_Age.getText().toString());
-     mDbOpenHelper.open();
-     mDbOpenHelper.insertColumn(ID, name, age, gender);
-     showDatabase(sort);
-     setInsertMode();
-     edit_ID.requestFocus();
-     edit_ID.setCursorVisible(true);
-     mDbOpenHelper.close();
-     break;
-
-     case R.id.btn_update:
-     ID = edit_ID.getText().toString();
-     name = edit_Name.getText().toString();
-     age = Long.parseLong(edit_Age.getText().toString());
-     mDbOpenHelper.updateColumn(nowIndex,ID, name, age, gender);
-     showDatabase(sort);
-     setInsertMode();
-     edit_ID.requestFocus();
-     edit_ID.setCursorVisible(true);
-     break;
-
-     case R.id.btn_select:
-     showDatabase(sort);
-     break;
-
-     case R.id.check_man:
-     check_Woman.setChecked(false);
-     gender = "Man";
-     break;
-
-     case R.id.check_woman:
-     check_Man.setChecked(false);
-     gender = "Woman";
-     break;
-
-     case R.id.check_userid:
-     check_Name.setChecked(false);
-     check_Age.setChecked(false);
-     sort = "userid";
-     break;
-
-     case R.id.check_name:
-     check_ID.setChecked(false);
-     check_Age.setChecked(false);
-     sort = "name";
-     break;
-
-     case R.id.check_age:
-     check_ID.setChecked(false);
-     check_Name.setChecked(false);
-     sort = "age";
-     break;
-     }
-     }
-     // 블루투스
-     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-     Log.d(TAG,"onActivityResult " + resultCode);
-
-     switch (requestCode) {
-
-     case REQUEST_CONNECT_DEVICE:
-     // When DeviceListActivity returns with a device to connect
-     if (resultCode == Activity.RESULT_OK) {
-     btService.getDeviceInfo(data);
-     }
-     break;
-     case REQUEST_ENABLE_BT:
-     // 블루투스 요청이 가능할 때
-     if(resultCode == Activity.RESULT_OK){
-     // Next Step
-     btService.scanDevice();
-     } else {
-     Log.d(TAG,"요청 거부");
-     Toast.makeText(MainActivity.this, "블루투스를 허용해야 정상적으로 기능이 이용 가능합니다!", Toast.LENGTH_SHORT).show();
-     }
-     break;
-     }
-     }
-     */
 }
-
-// 대충 이 아래부터 DB코드
-/**
-    Button btn_Update;
-    Button btn_Insert;
-    Button btn_Select;
-    EditText edit_ID;
-    EditText edit_Name;
-    EditText edit_Age;
-    TextView text_ID;
-    TextView text_Name;
-    TextView text_Age;
-    TextView text_Gender;
-    CheckBox check_Man;
-    CheckBox check_Woman;
-    CheckBox check_ID;
-    CheckBox check_Name;
-    CheckBox check_Age;
-
-    // DB 변수 및 테스트를 위한 디폴트값
-    long nowIndex;
-    int bpm;
-    String status = "위험";
-    String sort = "userid";
-    // DB테스트
-
-    ArrayAdapter<String> arrayAdapter;
-
-    static ArrayList<String> arrayIndex =  new ArrayList<String>();
-    static ArrayList<String> arrayData = new ArrayList<String>();
-    private DbOpenHelper mDbOpenHelper;
-
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        btn_Insert = (Button) findViewById(R.id.btn_insert);
-        btn_Insert.setOnClickListener(this);
-        btn_Update = (Button) findViewById(R.id.btn_update);
-        btn_Update.setOnClickListener(this);
-        btn_Select = (Button) findViewById(R.id.btn_select);
-        btn_Select.setOnClickListener(this);
-        edit_ID = (EditText) findViewById(R.id.edit_id);
-        edit_Name = (EditText) findViewById(R.id.edit_name);
-        edit_Age = (EditText) findViewById(R.id.edit_age);
-        text_ID = (TextView) findViewById(R.id.text_id);
-        text_Name = (TextView) findViewById(R.id.text_name);
-        text_Age = (TextView) findViewById(R.id.text_age);
-        text_Gender= (TextView) findViewById(R.id.text_gender);
-        check_Man = (CheckBox) findViewById(R.id.check_man);
-        check_Man.setOnClickListener(this);
-        check_Woman = (CheckBox) findViewById(R.id.check_woman);
-        check_Woman.setOnClickListener(this);
-        check_ID = (CheckBox) findViewById(R.id.check_userid);
-        check_ID.setOnClickListener(this);
-        check_Name = (CheckBox) findViewById(R.id.check_name);
-        check_Name.setOnClickListener(this);
-        check_Age = (CheckBox) findViewById(R.id.check_age);
-        check_Age.setOnClickListener(this);
-
-        arrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1);
-        ListView listView = (ListView) findViewById(R.id.db_list_view);
-        listView.setAdapter(arrayAdapter);
-        listView.setOnItemClickListener(onClickListener);
-        listView.setOnItemLongClickListener(longClickListener);
-
-        mDbOpenHelper = new DbOpenHelper(this);
-        mDbOpenHelper.open();
-        mDbOpenHelper.create();
-
-        check_ID.setChecked(true);
-        showDatabase(sort);
-
-        btn_Insert.setEnabled(true);
-        btn_Update.setEnabled(false);
-        mDbOpenHelper.close();
-    }
-    //DB
-    public void setInsertMode(){
-        edit_ID.setText("");
-        edit_Name.setText("");
-        edit_Age.setText("");
-        check_Man.setChecked(false);
-        check_Woman.setChecked(false);
-        btn_Insert.setEnabled(true);
-        btn_Update.setEnabled(false);
-    }
-
-    //클릭리스너 in DB
-    private AdapterView.OnItemClickListener onClickListener = new AdapterView.OnItemClickListener() {
-        @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Log.e("On Click", "position = " + position);
-            nowIndex = Long.parseLong(arrayIndex.get(position));
-            Log.e("On Click", "nowIndex = " + nowIndex);
-            Log.e("On Click", "Data: " + arrayData.get(position));
-            String[] tempData = arrayData.get(position).split("\\s+");
-            Log.e("On Click", "Split Result = " + tempData);
-            edit_ID.setText(tempData[0].trim());
-            edit_Name.setText(tempData[1].trim());
-            edit_Age.setText(tempData[2].trim());
-            if(tempData[3].trim().equals("Man")){
-                check_Man.setChecked(true);
-                //gender = "Man";
-            }else{
-                check_Woman.setChecked(true);
-                //gender = "Woman";
-            }
-            btn_Insert.setEnabled(false);
-            btn_Update.setEnabled(true);
-        }
-    };
-
-    //롱클릭 리스터 in DB
-    private AdapterView.OnItemLongClickListener longClickListener = new AdapterView.OnItemLongClickListener() {
-        @Override
-        public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-            Log.d("Long Click", "position = " + position);
-            nowIndex = Long.parseLong(arrayIndex.get(position));
-            String[] nowData = arrayData.get(position).split("\\s+");
-            String viewData = nowData[0] + ", " + nowData[1] + ", " + nowData[2] + ", " + nowData[3];
-            AlertDialog.Builder dialog = new AlertDialog.Builder(MainActivity.this);
-            dialog.setTitle("데이터 삭제")
-                    .setMessage("해당 데이터를 삭제 하시겠습니까?" + "\n" + viewData)
-                    .setPositiveButton("네", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(MainActivity.this, "데이터를 삭제했습니다.", Toast.LENGTH_SHORT).show();
-                            mDbOpenHelper.deleteColumn(nowIndex);
-                            showDatabase(sort);
-                            setInsertMode();
-                        }
-                    })
-                    .setNegativeButton("아니오", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(MainActivity.this, "삭제를 취소했습니다.", Toast.LENGTH_SHORT).show();
-                            setInsertMode();
-                        }
-                    })
-                    .create()
-                    .show();
-            return false;
-        }
-    };
-
-    //데이터 베이스 출력 함수
-    public void showDatabase(String sort){
-        Cursor iCursor = mDbOpenHelper.sortColumn(sort);
-        Log.d("showDatabase", "DB Size: " + iCursor.getCount());
-        arrayData.clear();
-        arrayIndex.clear();
-        while(iCursor.moveToNext()){
-            String tempIndex = iCursor.getString(iCursor.getColumnIndex("_id"));
-            String tempUser = iCursor.getString(iCursor.getColumnIndex("userid"));
-            tempUser = setTextLength(tempUser,10);
-            String tempDate = iCursor.getString(iCursor.getColumnIndex("date"));
-            tempDate = setTextLength(tempDate,15);
-            String tempTime = iCursor.getString(iCursor.getColumnIndex("time"));
-            tempTime = setTextLength(tempTime,12);
-            String tempBPM = iCursor.getString(iCursor.getColumnIndex("bpm"));
-            tempBPM = setTextLength(tempBPM,5);
-            String tempStatus = iCursor.getString(iCursor.getColumnIndex("status"));
-            tempStatus = setTextLength(tempStatus,10);
-
-            String Result = tempUser + tempDate + tempTime + tempBPM + tempStatus;
-            arrayData.add(Result);
-            arrayIndex.add(tempIndex);
-        }
-        arrayAdapter.clear();
-        arrayAdapter.addAll(arrayData);
-        arrayAdapter.notifyDataSetChanged();
-    }
-
-    //텍스트 길이 조정 in DB
-    public String setTextLength(String text, int length){
-        if(text.length()<length){
-            int gap = length - text.length();
-            for (int i=0; i<gap; i++){
-                text = text + " ";
-            }
-        }
-        return text;
-    }
-
-    @Override
-    public void onClick(View v) {
-        //DB
-        switch (v.getId()) {
-            case R.id.btn_insert:
-                bpm = 5;// 테스트용 숫자
-                status = check_Status(bpm);
-                mDbOpenHelper.open();
-                mDbOpenHelper.insertColumn(Integer.toString(bpm), status);
-                showDatabase(sort);
-                setInsertMode();
-                edit_ID.requestFocus();
-                edit_ID.setCursorVisible(true);
-                mDbOpenHelper.close();
-                break;
-
-            /*case R.id.btn_update:
-                ID = edit_ID.getText().toString();
-                name = edit_Name.getText().toString();
-                age = Long.parseLong(edit_Age.getText().toString());
-                mDbOpenHelper.updateColumn(nowIndex,ID, name, age, gender);
-                showDatabase(sort);
-                setInsertMode();
-                edit_ID.requestFocus();
-                edit_ID.setCursorVisible(true);
-                break;
-*/
-
-/**
-            case R.id.btn_select:
-                mDbOpenHelper.open();
-                showDatabase(sort);
-                mDbOpenHelper.close();
-                break;
-/*
-            case R.id.check_man:
-                check_Woman.setChecked(false);
-                gender = "Man";
-                break;
-
-            case R.id.check_woman:
-                check_Man.setChecked(false);
-                gender = "Woman";
-                break;
-*/
-/**
-            case R.id.check_userid:
-                check_Name.setChecked(false);
-                check_Age.setChecked(false);
-                sort = "userid";
-                break;
-
-            case R.id.check_name:
-                check_ID.setChecked(false);
-                check_Age.setChecked(false);
-                sort = "DATE";
-                break;
-
-            case R.id.check_age:
-                check_ID.setChecked(false);
-                check_Name.setChecked(false);
-                sort = "TIME";
-                break;
-        }
-    }
-
-    private String check_Status(int BPM) {  // 현재 상태를 BPM에 따라 판단.
-        String status="";
-        if(BPM <= 5){
-            status = "응급";
-            // 여기에 응급 처리 함수()
-        } else if(BPM < 60) {   // 서맥 관측
-            status = "주의";
-            // 주의();
-        } else if (BPM <=100) {
-            status = "정상";
-        } else if (BPM>100) {   // 빈맥 관측
-            status = "주의";
-            // 주의();
-        }
-        return status;
-    }
- */

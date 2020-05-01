@@ -1,9 +1,12 @@
 package com.example.wscad;
 
+import android.app.Activity;
+import android.os.Bundle;
 import android.provider.BaseColumns;
 
 public final class DataBases {
     public static final class CreateDB implements BaseColumns {
+
         public static final String USERID = "userid";   // 유저 코드
         public static final String DATE = "date";   // 생성 날짜
         public static final String TIME = "time";   // 생성 시간
@@ -17,5 +20,6 @@ public final class DataBases {
                 +TIME+" text not null , "
                 +BPM+" text not null , "
                 +STATUS+" text not null );";
-    }   // 컬럼 하나에 약 2KB 용량
+
+    }
 }
