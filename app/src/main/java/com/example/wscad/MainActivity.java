@@ -1,16 +1,24 @@
 package com.example.wscad;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -40,8 +48,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     // PopupMenu
     private Button mButton_pop;
 
-    // test
-    String read_message = "";
     // Debugging
     private static final String TAG = "Main";
     private static final boolean D = true;
@@ -60,6 +66,13 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     private static final int REQUEST_CONNECT_DEVICE = 1;    // 블루투스 기기연결
     private static final int REQUEST_ENABLE_BT = 2; // 블루투스 켜기
     private static final int RESULT_GPS_REQUEST = 900; // GPS 수신 결과
+    private final int MY_PERMISSION_REQUEST_SMS = 1001; // SMS 퍼미션 요청 결과
+    private static final int GPS_ENABLE_REQUEST_CODE = 2001; // GPS 켜기 요청 결과
+    private static final int PERMISSIONS_REQUEST_CODE = 100; // GPS 퍼미션 요청 결과
+    String[] REQUIRED_PERMISSIONS  = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+    };
 
     // Layout Views
     private TextView mTitle;
@@ -177,7 +190,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
 
         heartbit = (TextView) findViewById(R.id.textView2);
-
+        permissionCheck(Manifest.permission.SEND_SMS, "메시지 전송");
+        check_Status(5);
     }
 
     @Override
@@ -400,10 +414,25 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     mLocation = data.getExtras().getString("Location");
                     mLatitude = data.getExtras().getDouble("latitude");
                     mLongitude = data.getExtras().getDouble("longitude");
-                    Toast.makeText(this, mLocation, Toast.LENGTH_SHORT).show();
+                    new SmsWrite("01068608374", "심정지 환자가\n\n"+mLocation+"\n에서 발생했습니다.");
+                    // 주변에 도움을 요청하기 위해 링톤 객체 생성
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                    final Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),notification);
+                    // 알람 재생
+                    ringtone.play();
+
+                    // 정지를 위한 코드일 뿐 나중에 버튼을 눌러 정지하는 방향으로 변경할 예정.
+                    Handler mHandler = new Handler();
+                    mHandler.postDelayed(new Runnable()  {
+                        public void run() {
+                            // 시간 지난 후 실행할 코딩
+                            ringtone.stop();
+                        }
+                    }, 500); // 0.5초후
                 } else {   // RESULT_CANCEL
-                    //Toast.makeText(MainActivity.this, "위치 조회에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "위치 조회에 실패했습니다.", Toast.LENGTH_SHORT).show();
                 }
+                break;
         }
     }
 
@@ -431,5 +460,109 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 return true;
         }
         return false;
+    }
+
+    // 실행 중 퍼미션 권한 획득 메서드. 메신저와 위치
+    private void permissionCheck(String per, String msg){
+        final String permission = per;
+        final String message = msg;
+        if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                // Android provides a utility method, shouldShowRequestPermissionRationale(), that returns true if the user has previously
+                // denied the request, and returns false if a user has denied a permission and selected the Don't ask again option in the
+                // permission request dialog, or if a device policy prohibits the permission. If a user keeps trying to use functionality that
+                // requires a permission, but keeps denying the permission request, that probably means the user doesn't understand why
+                // the app needs the permission to provide that functionality. In a situation like that, it's probably a good idea to show an
+                // explanation.
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("권한 설정");
+                builder.setMessage("이 앱을 실행하려면 "+message+" 권한이 필요합니다.");
+                builder.setIcon(android.R.drawable.ic_dialog_info);
+
+                builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission}, MY_PERMISSION_REQUEST_SMS);
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+                dialog.show();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[] {permission}, MY_PERMISSION_REQUEST_SMS);
+            }
+        }
+
+        //런타임 퍼미션 처리
+        // 1. 위치 퍼미션을 가지고 있는지 체크합니다.
+        int hasFineLocationPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION);
+        int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_COARSE_LOCATION);
+
+
+        if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED &&
+                hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+            // 2. 이미 퍼미션을 가지고 있다면
+            // ( 안드로이드 6.0 이하 버전은 런타임 퍼미션이 필요없기 때문에 이미 허용된 걸로 인식합니다.)
+        } else {  //2. 퍼미션 요청을 허용한 적이 없다면 퍼미션 요청이 필요합니다. 2가지 경우(3-1, 4-1)가 있습니다.
+            // 3-1. 사용자가 퍼미션 거부를 한 적이 있는 경우에는
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])) {
+                // 3-2. 요청을 진행하기 전에 사용자가에게 퍼미션이 필요한 이유를 설명해줄 필요가 있습니다.
+                Toast.makeText(this, "이 앱을 실행하려면 위치 접근 권한이 필요합니다.", Toast.LENGTH_LONG).show();
+                // 3-3. 사용자게에 퍼미션 요청을 합니다. 요청 결과는 onRequestPermissionResult에서 수신됩니다.
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS, PERMISSIONS_REQUEST_CODE);
+
+
+            } else {
+                // 4-1. 사용자가 퍼미션 거부를 한 적이 없는 경우에는 퍼미션 요청을 바로 합니다.
+                // 요청 결과는 onRequestPermissionResult에서 수신됩니다.
+                ActivityCompat.requestPermissions(this, REQUIRED_PERMISSIONS,
+                        PERMISSIONS_REQUEST_CODE);
+            }
+
+        }
+    }
+
+    // 퍼미션 결과
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSION_REQUEST_SMS: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Toast.makeText(this,"Permission granted.",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this,"Permission denied.",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        if ( requestCode == PERMISSIONS_REQUEST_CODE && grantResults.length == REQUIRED_PERMISSIONS.length) {
+            // 요청 코드가 PERMISSIONS_REQUEST_CODE 이고, 요청한 퍼미션 개수만큼 수신되었다면
+            boolean check_result = true;
+            // 모든 퍼미션을 허용했는지 체크합니다.
+            for (int result : grantResults) {
+                if (result != PackageManager.PERMISSION_GRANTED) {
+                    check_result = false;
+                    break;
+                }
+            }
+            if ( check_result ) {
+                //위치 값을 가져올 수 있음
+                ;
+            }
+            else {
+                // 거부한 퍼미션이 있다면 앱을 사용할 수 없는 이유를 설명해주고 앱을 종료합니다.2 가지 경우가 있습니다.
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[0])
+                        || ActivityCompat.shouldShowRequestPermissionRationale(this, REQUIRED_PERMISSIONS[1])) {
+                    Toast.makeText(this, "퍼미션이 거부되었습니다. 앱을 다시 실행하여 퍼미션을 허용해주세요.", Toast.LENGTH_LONG).show();
+                    finish();
+                }else {
+                    Toast.makeText(this, "퍼미션이 거부되었습니다. 설정(앱 정보)에서 퍼미션을 허용해야 합니다. ", Toast.LENGTH_LONG).show();
+                }
+            }
+
+        }
     }
 }
