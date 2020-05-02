@@ -9,6 +9,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -419,6 +421,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
                     final Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),notification);
                     // 알람 재생
+                    ringtone.setStreamType(AudioManager.STREAM_ALARM);
                     ringtone.play();
 
                     // 정지를 위한 코드일 뿐 나중에 버튼을 눌러 정지하는 방향으로 변경할 예정.
