@@ -9,6 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -412,7 +415,20 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     mLatitude = data.getExtras().getDouble("latitude");
                     mLongitude = data.getExtras().getDouble("longitude");
                     new SmsWrite("01068608374", "심정지 환자가\n\n"+mLocation+"\n에서 발생했습니다.");
-                    //Toast.makeText(this, mLocation, Toast.LENGTH_SHORT).show();
+                    // 주변에 도움을 요청하기 위해 링톤 객체 생성
+                    Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+                    final Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),notification);
+                    // 알람 재생
+                    ringtone.play();
+
+                    // 정지를 위한 코드일 뿐 나중에 버튼을 눌러 정지하는 방향으로 변경할 예정.
+                    Handler mHandler = new Handler();
+                    mHandler.postDelayed(new Runnable()  {
+                        public void run() {
+                            // 시간 지난 후 실행할 코딩
+                            ringtone.stop();
+                        }
+                    }, 500); // 0.5초후
                 } else {   // RESULT_CANCEL
                     Toast.makeText(MainActivity.this, "위치 조회에 실패했습니다.", Toast.LENGTH_SHORT).show();
                 }
