@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.wscad">
-    <uses-permission android:name="android.permission.BLUETOOTH" /><!--블루투스 권한-->
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /><!--블루투스 권한-->
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /><!--위치 정보 조회 권한 획득-->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH" /> <!-- 블루투스 권한 -->
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" /> <!-- 블루투스 권한 -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /> <!-- 위치 정보 조회 권한 획득 -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -13,14 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-        <service android:name=".MyFirebaseMessagingService"
-            android:enabled="true"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT" />
-            </intent-filter>
-
-        </service>
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -29,12 +23,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".DBActivity"/>
-        <activity android:name=".DeviceListActivity"
+        <activity android:name=".DBActivity" />
+        <activity
+            android:name=".DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:label="@string/select_device"
-            android:theme="@android:style/Theme.Dialog"
-            android:configChanges="orientation|keyboardHidden" />
-        <activity android:name=".GPSActivity"></activity>
+            android:theme="@android:style/Theme.Dialog" />
+        <activity android:name=".GPSActivity" />
     </application>
 
 </manifest>
