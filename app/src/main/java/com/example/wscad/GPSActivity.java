@@ -28,7 +28,7 @@ import java.util.Locale;
 
 public class GPSActivity extends AppCompatActivity {
     private GpsTracker gpsTracker;
-
+    private static final String TAG = "GPS";
     private static final int GPS_ENABLE_REQUEST_CODE = 2001;
     private static final int PERMISSIONS_REQUEST_CODE = 100;
     String[] REQUIRED_PERMISSIONS  = {
@@ -41,13 +41,6 @@ public class GPSActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        if (!checkLocationServicesStatus()) {
-
-            showDialogForLocationServiceSetting();
-        }else {
-
-            checkRunTimePermission();
-        }
 
         gpsTracker = new GpsTracker(GPSActivity.this);
 
@@ -55,14 +48,13 @@ public class GPSActivity extends AppCompatActivity {
         double longitude = gpsTracker.getLongitude();
         // 현재 위도, 경도를 기준으로 주소 반환
         String address = getCurrentAddress(latitude, longitude);
-
         Intent intent = new Intent();
         // 위도, 경도, 위치정보 반환
         intent.putExtra("latitude", latitude);
         intent.putExtra("longitude", longitude);
         intent.putExtra("Location", address);
         setResult(RESULT_OK, intent);
-        //finish();
+        finish();
     }
 
 
@@ -252,7 +244,6 @@ public class GPSActivity extends AppCompatActivity {
     }
     @Override
     public void onBackPressed() {
-        Toast.makeText(GPSActivity.this, "뒤로가기기", Toast.LENGTH_SHORT).show();
         finish();
     }
 }
