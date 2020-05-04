@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     private static final int REQUEST_CONNECT_DEVICE = 1;    // 블루투스 기기연결
     private static final int REQUEST_ENABLE_BT = 2; // 블루투스 켜기
     private static final int RESULT_GPS_REQUEST = 900; // GPS 수신 결과
+    private static final int RESULT_ALARM_REQUEST = 901;
     private final int MY_PERMISSION_REQUEST_SMS = 1001; // SMS 퍼미션 요청 결과
     private static final int GPS_ENABLE_REQUEST_CODE = 2001; // GPS 켜기 요청 결과
     private static final int PERMISSIONS_REQUEST_CODE = 100; // GPS 퍼미션 요청 결과
@@ -416,22 +417,15 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     mLocation = data.getExtras().getString("Location");
                     mLatitude = data.getExtras().getDouble("latitude");
                     mLongitude = data.getExtras().getDouble("longitude");
-                    new SmsWrite("01068608374", "심정지 환자가\n\n"+mLocation+"\n에서 발생했습니다.");
-                    // 주변에 도움을 요청하기 위해 링톤 객체 생성
-                    Uri notification = Uri.parse("android.resource://com.example.wscad/raw/gen");
-                    final Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(),notification);
-                    // 알람 재생
-                    ringtone.setStreamType(AudioManager.STREAM_ALARM);
-                    ringtone.play();
-/*
-                    // 정지를 위한 코드일 뿐 나중에 버튼을 눌러 정지하는 방향으로 변경할 예정.
-                    Handler mHandler = new Handler();
-                    mHandler.postDelayed(new Runnable()  {
-                        public void run() {
-                            // 시간 지난 후 실행할 코딩
-                            ringtone.stop();
-                        }
-                    }, 500); // 0.5초후*/
+
+
+
+                    Intent intent = new Intent(this, AlarmActivity.class);
+                    intent.putExtra("latitude", mLongitude);
+                    intent.putExtra("longitude", mLatitude);
+                    intent.putExtra("address", mLocation);
+                    startActivityForResult(intent, RESULT_ALARM_REQUEST); // go to onActivityResult => RESULT_GPS_REQUEST
+
                 } else {   // RESULT_CANCEL
                     Toast.makeText(MainActivity.this, "위치 조회에 실패했습니다.", Toast.LENGTH_SHORT).show();
                 }

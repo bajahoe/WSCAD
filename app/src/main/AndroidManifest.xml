@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" /><!--위치 정보 조회 권한 획득-->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.SEND_SMS" /> <!-- SMS 전송 권한 획득 -->
+    <uses-permission android:name = "android.permission.VIBRATE"/> <!-- 진동 제어 권한 획득 -->
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -29,6 +30,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DBActivity" />
+        <activity android:name=".AlarmActivity" />
         <activity
             android:name=".DeviceListActivity"
             android:configChanges="orientation|keyboardHidden"
