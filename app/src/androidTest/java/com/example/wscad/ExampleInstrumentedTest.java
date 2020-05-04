@@ -11,6 +11,7 @@ import static org.junit.Assert.*;
 
 /**
  * Instrumented test, which will execute on an Android device.
+ * Instrumented emergent, which will execute on an Android device.
  *
  * @see <a href="http://d.android.com/tools/testing">Testing documentation</a>
  */
@@ -19,6 +20,7 @@ public class ExampleInstrumentedTest {
     @Test
     public void useAppContext() {
         // Context of the app under test.
+        // Context of the app under emergent.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
         assertEquals("com.example.wscad", appContext.getPackageName());
