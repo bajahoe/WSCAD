@@ -33,10 +33,13 @@
         android:id="@+id/timer_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="100dp"
-        android:layout_marginEnd="224dp"
-        android:layout_marginRight="224dp"
+        android:layout_marginTop="88dp"
         android:text="10초후 메시지가 전송됩니다."
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintHorizontal_bias="0.452"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/colorUrgent"
+        android:textSize="20dp"/>
+
 </android.support.constraint.ConstraintLayout>

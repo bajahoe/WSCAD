@@ -7,6 +7,7 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,9 +16,11 @@ import android.widget.TextView;
 
 public class AlarmActivity extends AppCompatActivity {
     Button b1;
+
     Thread alarmThread;
-    Thread smsThread;
     Thread timerThread;
+
+    Handler handler_time = new Handler();
 
     String address;
     TextView timer_text;
@@ -27,7 +30,7 @@ public class AlarmActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.test);
+        setContentView(R.layout.emergent);
 
         // 리소스 얻어오기
         b1 = (Button)findViewById(R.id.button);
@@ -49,30 +52,30 @@ public class AlarmActivity extends AppCompatActivity {
             public void run() {
 
                 try {
-                    for(; time>0 ; time--) {
 
-                        timer_text.setText(time+"초후 메시지가 전송됩니다.");
+                    for(; time>0 ; time--) {
+                        handler_time.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                timer_text.setText(time+"초후 메시지가 전송됩니다.");
+                            }
+                        });
                         Thread.sleep(1000);
 
                     }
-                    smsThread.start();
+
+                    new SmsWrite("01068608374", "심정지 환자가\n\n" + address + "\n에서 발생했습니다.");
+                    handler_time.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            timer_text.setText("구조 요청이 전송되었습니다.");
+                        }
+                    });
+
                 } catch (Exception e) { }
 
             }
         });
-
-        smsThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    Thread.sleep(10000);    // 10초 이내로 취소 버튼을 누르지 않으면 심정지로 간주하고 메시지를 전송한다.
-                    new SmsWrite("01068608374", "심정지 환자가\n\n" + address + "\n에서 발생했습니다.");
-                } catch (Exception e) {  }
-
-            }
-        });
-
 
         alarmThread = new Thread(new Runnable() {
             @Override
@@ -104,7 +107,7 @@ public class AlarmActivity extends AppCompatActivity {
     public void onDestroy( ) {
 
         super.onDestroy( );
-        smsThread.interrupt();
+        timerThread.interrupt();
         alarmThread.interrupt();
 
     }
