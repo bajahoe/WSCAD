@@ -194,7 +194,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
         heartbit = (TextView) findViewById(R.id.textView2);
         permissionCheck(Manifest.permission.SEND_SMS, "메시지 전송");
-        check_Status(5);
     }
 
     @Override
