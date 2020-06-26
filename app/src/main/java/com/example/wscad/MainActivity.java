@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -43,12 +44,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity /*implements View.OnClickListener*/ {
     // PopupMenu
     private Button mButton_pop;
+    private int mode = 0; // 0 일반 1 운동
+    // mode
+    private String FILENAME = "mode.txt";
+    private String FILEPATH;
 
     // Debugging
     private static final String TAG = "Main";
@@ -83,6 +93,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     private EditText mOutEditText;
     private Button mSendButton;
     private TextView heartbit;
+    private TextView temperbit;
 
     // Name of the connected device
     private String mConnectedDeviceName = null;
@@ -98,6 +109,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     // DB 변수 및 테스트를 위한 디폴트값
     long nowIndex;
     int bpm;
+    String temperature;
     String status = "위험";
     String sort = "userid";
     // DB테스트
@@ -112,6 +124,30 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (D) Log.e(TAG, "+++ ON CREATE +++");
+
+        // 종료 시 이전 모드 상태 불러오기
+        FILEPATH = getFilesDir().toString();
+        File file = new File(FILEPATH,FILENAME);
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.write("0");
+                fileWriter.close();
+            }else{
+                FileReader filereader = new FileReader(file);
+                int singleCh = 0;
+                while((singleCh = filereader.read()) != -1){
+                    if((char)singleCh == '0')
+                        mode = 0;
+                    else
+                        mode = 1;
+                }
+                filereader.close();
+            }
+        } catch (IOException e){
+            e.printStackTrace();
+        }
 
         // Set up the window layout
         final Window window = getWindow();
@@ -158,6 +194,10 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                                 startActivity(intent);
                                 return true;
 
+                            case R.id.exercisemode:
+                                Intent exerciseIntent = new Intent(MainActivity.this, ExerciseActivity.class);
+                                return true;
+
                         }
                         return false;
                     }
@@ -193,6 +233,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
 
         heartbit = (TextView) findViewById(R.id.textView2);
+        temperbit = (TextView) findViewById(R.id.textView_temp);
         permissionCheck(Manifest.permission.SEND_SMS, "메시지 전송");
     }
 
@@ -335,11 +376,15 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    heartbit.setText(readMessage);
-                    bpm=Integer.parseInt(readMessage);
+                    String[] array = readMessage.split(" ");
+                    temperature = array[0];
+                    heartbit.setText(array[1]);
+                    temperbit.setText(temperature);
+
+                    bpm=Integer.parseInt(array[1]);
                     status = check_Status(bpm);
                     mDbOpenHelper.open();
-                    mDbOpenHelper.insertColumn(Integer.toString(bpm), status);
+                    mDbOpenHelper.insertColumn(Integer.toString(bpm), status, mode);
                     mDbOpenHelper.close();
                     break;
 

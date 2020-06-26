@@ -44,6 +44,18 @@
         app:layout_constraintVertical_bias="0.592"
         app:srcCompat="@drawable/heart" />
 
+    <ImageView
+        android:id="@+id/imageView_temp"
+        android:layout_width="111dp"
+        android:layout_height="97dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.14"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.952"
+        app:srcCompat="@drawable/temp" />
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="184dp"
@@ -56,6 +68,19 @@
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="@+id/imageView"
         app:layout_constraintVertical_bias="0.531" />
+
+    <TextView
+        android:id="@+id/textView_temp"
+        android:layout_width="184dp"
+        android:layout_height="103dp"
+        android:gravity="center_horizontal"
+        android:text="체온"
+        android:textSize="35"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/imageView"
+        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintTop_toTopOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.988" />
 
 
 </android.support.constraint.ConstraintLayout>

@@ -17,6 +17,7 @@ public class DbOpenHelper {
     private DatabaseHelper mDBHelper;
     private Context mCtx;
 
+
     private class DatabaseHelper extends SQLiteOpenHelper {
 
         //DatabaseHelper(): 생성자.
@@ -38,9 +39,7 @@ public class DbOpenHelper {
         }
     }
 
-    public DbOpenHelper(Context context){
-        this.mCtx = context;
-    }
+    public DbOpenHelper(Context context){ this.mCtx = context; }
 
     //open(): 해당 데이터베이스를 열어서 사용할 수 있도록 해줌. getWritableDatabase()는 데이터베이스를 읽고 쓸 수 있도록 해줌.
     public DbOpenHelper open() throws SQLException {
@@ -59,7 +58,7 @@ public class DbOpenHelper {
     }
 
     //데이터 삽입.
-    public long insertColumn(String bpm, String status){
+    public long insertColumn(String bpm, String status, int mode){
         SimpleDateFormat _date = new SimpleDateFormat ( "yyyy-MM-dd");  // 날짜의 형식을 지정
         SimpleDateFormat _time = new SimpleDateFormat( "HH시mm분ss초");    // 시간의 형식을 지정
         String format_date = _date.format (System.currentTimeMillis()); // 현재 날짜 반환
@@ -67,6 +66,7 @@ public class DbOpenHelper {
 
         ContentValues values = new ContentValues(); // 데이터 틀 생성
         values.put(DataBases.CreateDB.USERID, userid);  // 사용자 정보
+        values.put(DataBases.CreateDB.MODE, mode);  // 사용자 정보
         values.put(DataBases.CreateDB.DATE, format_date);   // 날짜
         values.put(DataBases.CreateDB.TIME, format_time);   // 시간
         values.put(DataBases.CreateDB.BPM, bpm);    // 심박수
