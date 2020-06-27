@@ -5,63 +5,43 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.media.AudioAttributes;
-import android.media.AudioManager;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.View.OnClickListener;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity /*implements View.OnClickListener*/ {
+public class ExerciseActivity extends AppCompatActivity /*implements View.OnClickListener*/ {
     // PopupMenu
     private Button mButton_pop;
-    private int mode = 0; // 0 일반 1 운동
+    private int mode = 1;
     // mode
     private String FILENAME = "mode.txt";
     private String FILEPATH;
 
     // Debugging
-    private static final String TAG = "Main";
+    private static final String TAG = "ExerciseActivity";
     private static final boolean D = true;
     // Message types sent from the BluetoothService Handler
     public static final int MESSAGE_STATE_CHANGE = 1;
@@ -93,7 +73,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     private EditText mOutEditText;
     private Button mSendButton;
     private TextView heartbit;
-    private TextView temperbit;
 
     // Name of the connected device
     private String mConnectedDeviceName = null;
@@ -109,7 +88,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
     // DB 변수 및 테스트를 위한 디폴트값
     long nowIndex;
     int bpm;
-    String temperature;
     String status = "위험";
     String sort = "userid";
     // DB테스트
@@ -127,27 +105,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
         // 종료 시 이전 모드 상태 불러오기
         FILEPATH = getFilesDir().toString();
-        File file = new File(FILEPATH,FILENAME);
-        try {
-            if (!file.exists()) {
-                file.createNewFile();
-                FileWriter fileWriter = new FileWriter(file);
-                fileWriter.write("0");
-                fileWriter.close();
-            }else{
-                FileReader filereader = new FileReader(file);
-                int singleCh = 0;
-                while((singleCh = filereader.read()) != -1){
-                    if((char)singleCh == '0')
-                        mode = 0;
-                    else
-                        mode = 1;
-                }
-                filereader.close();
-            }
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+
 
         // Set up the window layout
         final Window window = getWindow();
@@ -156,7 +114,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
             useTitleFeature = window
                     .requestFeature(Window.FEATURE_CUSTOM_TITLE);
         }
-        setContentView(R.layout.activity_main); // 중복이니 코드수정
+        setContentView(R.layout.exercise_mode); // 중복이니 코드수정
         if (useTitleFeature) {
             window.setFeatureInt(Window.FEATURE_CUSTOM_TITLE,
                     R.layout.custom_title);
@@ -183,19 +141,13 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
-                            case R.id.scan: // 기기 검색
-                                // Launch the DeviceListActivity to see devices and do scan
-                                Intent serverIntent = new Intent(MainActivity.this, DeviceListActivity.class);
-                                startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);   // 기기 연결 요청
-                                return true;
-
-                            case R.id.diagnose:
-                                Intent intent = new Intent(MainActivity.this, DBActivity.class);
+                           case R.id.diagnose:
+                                Intent intent = new Intent(ExerciseActivity.this, DBActivity.class);
                                 startActivity(intent);
                                 return true;
 
                             case R.id.exercisemode:
-                                Intent exerciseIntent = new Intent(MainActivity.this, ExerciseActivity.class);
+                                finish();
                                 return true;
 
                         }
@@ -233,7 +185,6 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
 
 
         heartbit = (TextView) findViewById(R.id.textView2);
-        temperbit = (TextView) findViewById(R.id.textView_temp);
         permissionCheck(Manifest.permission.SEND_SMS, "메시지 전송");
     }
 
@@ -376,12 +327,8 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 case MESSAGE_READ:
                     byte[] readBuf = (byte[]) msg.obj;
                     String readMessage = new String(readBuf, 0, msg.arg1);
-                    String[] array = readMessage.split(" ");
-                    temperature = array[0];
-                    heartbit.setText(array[1]);
-                    temperbit.setText(temperature);
-
-                    bpm=Integer.parseInt(array[1]);
+                    heartbit.setText(readMessage);
+                    bpm=Integer.parseInt(readMessage);
                     status = check_Status(bpm);
                     mDbOpenHelper.open();
                     mDbOpenHelper.insertColumn(Integer.toString(bpm), status, mode);
@@ -471,7 +418,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                     startActivityForResult(intent, RESULT_ALARM_REQUEST); // go to onActivityResult => RESULT_GPS_REQUEST
 
                 } else {   // RESULT_CANCEL
-                    Toast.makeText(MainActivity.this, "위치 조회에 실패했습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ExerciseActivity.this, "위치 조회에 실패했습니다.", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -496,7 +443,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 return true;
 
             case R.id.diagnose:
-                Intent intent = new Intent(MainActivity.this, DBActivity.class);
+                Intent intent = new Intent(ExerciseActivity.this, DBActivity.class);
                 startActivity(intent);
                 return true;
         }
@@ -509,6 +456,12 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
         final String message = msg;
         if (ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, permission)) {
+                // Android provides a utility method, shouldShowRequestPermissionRationale(), that returns true if the user has previously
+                // denied the request, and returns false if a user has denied a permission and selected the Don't ask again option in the
+                // permission request dialog, or if a device policy prohibits the permission. If a user keeps trying to use functionality that
+                // requires a permission, but keeps denying the permission request, that probably means the user doesn't understand why
+                // the app needs the permission to provide that functionality. In a situation like that, it's probably a good idea to show an
+                // explanation.
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("권한 설정");
@@ -518,7 +471,7 @@ public class MainActivity extends AppCompatActivity /*implements View.OnClickLis
                 builder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        ActivityCompat.requestPermissions(MainActivity.this, new String[] {permission}, MY_PERMISSION_REQUEST_SMS);
+                        ActivityCompat.requestPermissions(ExerciseActivity.this, new String[] {permission}, MY_PERMISSION_REQUEST_SMS);
                     }
                 });
 

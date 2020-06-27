@@ -20,10 +20,6 @@ import android.widget.TextView;
 
 import java.util.Set;
 
-/**
- * Created by seo on 2018. 9. 10..
- */
-
 public class DeviceListActivity extends Activity {
     // Debugging
     private static final String TAG = "DeviceListActivity";
