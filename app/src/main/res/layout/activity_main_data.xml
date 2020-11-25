@@ -6,7 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ScrollView
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/linechart"
+        android:layout_width="match_parent"
+        android:layout_height="376dp" />
+
+    <!--<ScrollView
         android:id="@+id/scroll_view"
         android:layout_width="match_parent"
         android:layout_height="726dp"
@@ -20,6 +25,5 @@
             android:stackFromBottom="true"
             android:layout_width="match_parent"
             android:layout_height="match_parent"></ListView>
-
-    </ScrollView>
+    </ScrollView> -->
 </RelativeLayout>

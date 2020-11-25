@@ -19,7 +19,7 @@ public final class DataBases {
                 +MODE+ " integer not null, "
                 +USERID+" text not null , "
                 +DATE+" text not null , "
-                +TIME+" text not null , "
+                +TIME+" integer not null , "
                 +BPM+" text not null , "
                 +STATUS+" text not null );";
 

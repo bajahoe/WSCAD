@@ -60,7 +60,7 @@ public class DbOpenHelper {
     //데이터 삽입.
     public long insertColumn(String bpm, String status, int mode){
         SimpleDateFormat _date = new SimpleDateFormat ( "yyyy-MM-dd");  // 날짜의 형식을 지정
-        SimpleDateFormat _time = new SimpleDateFormat( "HH시mm분ss초");    // 시간의 형식을 지정
+        SimpleDateFormat _time = new SimpleDateFormat( "HHmmss");    // 시간의 형식을 지정
         String format_date = _date.format (System.currentTimeMillis()); // 현재 날짜 반환
         String format_time = _time.format (System.currentTimeMillis()); // 현재 시간 반환
 
@@ -68,7 +68,7 @@ public class DbOpenHelper {
         values.put(DataBases.CreateDB.USERID, userid);  // 사용자 정보
         values.put(DataBases.CreateDB.MODE, mode);  // 사용자 정보
         values.put(DataBases.CreateDB.DATE, format_date);   // 날짜
-        values.put(DataBases.CreateDB.TIME, format_time);   // 시간
+        values.put(DataBases.CreateDB.TIME, Integer.parseInt(format_time));   // 시간
         values.put(DataBases.CreateDB.BPM, bpm);    // 심박수
         values.put(DataBases.CreateDB.STATUS, status);  // 심박수에 따른 상태
         return mDB.insert(DataBases.CreateDB._TABLENAME0, null, values);
@@ -82,6 +82,12 @@ public class DbOpenHelper {
     //데이터 정렬
     public Cursor sortColumn(String sort){
         Cursor c = mDB.rawQuery( "SELECT * FROM userstatus ORDER BY " + sort + ";", null);
+        return c;
+    }
+
+    // 데이터 검색
+    public Cursor searchCulumn(String time){
+        Cursor c = mDB.rawQuery( "SELECT TIME, BPM FROM userstatus WHERE time > "+ time + ";", null);
         return c;
     }
 
